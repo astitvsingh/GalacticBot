@@ -20,11 +20,9 @@ class BotLogicVariable {
 }
 
 BotLogicVariable.getFloat = function(v) {
-	console.log('v = ', v);
-	
 	if (v == null)
 		return 0;
-	else if (typeof v == 'object' && v.constructor == 'BotLogicVariable')
+	else if (typeof v == 'object' && v.constructor.name == 'BotLogicVariable')
 		return v.getFloat();
 
 	return parseFloat(v);
@@ -33,7 +31,7 @@ BotLogicVariable.getFloat = function(v) {
 BotLogicVariable.getString = function(v) {
 	if (v == null)
 		return "";
-	else if (typeof v == 'object' && v.constructor == 'BotLogicVariable')
+	else if (typeof v == 'object' && v.constructor.name == 'BotLogicVariable')
 		return v.getString();
 	
 	return new String(v);
