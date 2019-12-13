@@ -6,4 +6,8 @@ With GalacticBot you can run bot(s) with custom strategies which you can make wi
 
 Bots can be run locally on your machine or on a server.
 
-# Currently in beta. Documentation will be updated soon.
+# Live demo
+https://galacticbot.com:3000/
+
+- Currently in beta.
+- Documentation will be updated soon.
