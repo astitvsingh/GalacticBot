@@ -113,6 +113,7 @@ class Config {
 		configCopy.ssl.enabled = false;
 		configCopy.ssl.keyFile = '';
 		configCopy.ssl.certificateFile = '';
+		configCopy.ssl.bundleFile = '';
 		
 		data = JSON.stringify(configCopy);
 		fs.writeFileSync(__dirname + '/../config.example.json', data);
