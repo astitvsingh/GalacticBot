@@ -1,0 +1,21 @@
+Brief instructions to install Galactic Bot. Will be updated to a full guide.
+
+- install the following packages: npm, nodejs, git, mongodb, mongodb-server
+- npm install forever -g
+ 
+- Clone this repository to a folder, for example /srv/galacticbot/
+- cd /srv/galacticbot/
+- cd botserver
+- npm install
+- cd ../
+- cd webserver
+- npm install
+- cd ../
+ 
+Start mongodb in the background
+- cd /srv/galacticbot/
+- mongod --config ./db/mongo.conf --fork
+
+Start the web and bot server
+- forever start webserver/bin/www 
+- forever start botserver/bin/server 

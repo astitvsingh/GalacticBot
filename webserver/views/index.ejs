@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Galactic Bot</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,700&display=swap" rel="stylesheet">
+		<link rel='stylesheet' href='/fonts/fontawesome/css/fontawesome.min.css' />
+		<link rel='stylesheet' href='/fonts/fontawesome/css/regular.css' />
+		<link rel='stylesheet' href='/fonts/fontawesome/css/solid.css' />
+		<link rel='stylesheet' href='/css/style.css' />
+
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+		<link rel="manifest" href="/favicon/site.webmanifest">
+		<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
+		<meta name="msapplication-TileColor" content="#2b5797">
+		<meta name="theme-color" content="#ffffff">
+
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+		<script src="/vendor/moment.min.js"></script>
+		<script src="/js/BotLogic.js"></script>
+		<script src="/js/API.js"></script>
+		<script src="/js/Disabler.js"></script>
+		<script src="/js/Popover.js"></script>
+		<script src="/js/BotList.js"></script>
+		<script src="/js/BotListElement.js"></script>
+		<script src="/js/BotDetails.js"></script>
+		<script src="/js/Updater.js"></script>
+		<script src="/js/base.js"></script>
+	</head>
+	<body>
+		<div id="master-password">
+			<h1>GalacticBot</h1>
+		</div>
+		<div id="app" class="loading">
+			<div class="row heading">
+				<div class="column" id="bot-list-heading">
+					<h1>GalacticBot</h1>
+				</div>
+				<div class="column" id="bot-detail-heading">
+					<div class="block">
+						<div class="title">Bot processes</div>
+						<div class="value"><span class="mono" id="system-bot-count">...</span></div>
+					</div>
+					<div class="block">
+						<div class="title">CPU usage</div>
+						<div class="value"><span class="mono" id="system-cpu-usage">...</span> %</div>
+					</div>					
+					<div class="block">
+						<div class="title">Memory usage</div>
+						<div class="value"><span class="mono" id="system-memory-usage">...</span> %</div>
+					</div>					
+				</div>
+			</div>
+			<div class="row">
+				<div class="column" id="navigation">
+					<div class="section" id="section-bots-live">
+						<div class="label">Live bots</div>
+					</div>
+					<div class="option bot template">
+						<div class="icon"><i class="fas fa-robot"></i></div>
+						<div class="label">3002</div>
+					</div>
+					<div class="action" id="action-add-bot">
+						<div class="icon"><i class="fas fa-plus"></i></div>
+						<div class="label">Add new bot</div>
+					</div>
+					<div class="section" id="section-bots-testnet">
+						<div class="label">Testnet bots</div>
+					</div>
+					
+					<div class="section">
+						<div class="label">Settings</div>
+					</div>
+					<div class="option disabled">
+						<div class="icon"><i class="fas fa-cog"></i></div>
+						<div class="label">Horizon API (default)</div>
+					</div>
+					
+				</div>
+				<div class="column" id="bot-detail">
+					<div class="inner">
+						<h2><span>&nbsp;</span><!--<i class="fas fa-pen"></i>--></h2>
+						<div class="tabs disabled">
+							<div class="tab-button" id="bot-tab-status-button" data-tab-name="bot-tab-status">
+								<div>State</div>
+							</div>
+							<div class="tab-button" id="bot-tab-logic-button" data-tab-name="bot-tab-logic">
+								<div>Strategy</div>
+							</div>
+							<div class="tab-button" id="bot-tab-settings-button" data-tab-name="bot-tab-settings">
+								<div>Settings</div>
+							</div>
+						</div>
+						<div class="tab hidden" id="bot-tab-status">
+							<div class="pane">
+								<div class="block">
+									<div class="title">State</div>
+									<div class="value state-running-show state-changing-disable"><div class="icon"><i class="fas fa-play"></i></div> Running</div>
+									<div class="value state-stopped-show state-changing-disable"><div class="icon"><i class="fas fa-stop"></i></div> Stopped</div>
+									<div class="value state-crashed-show"><div class="icon"><i class="fas fa-times"></i></div> Crashed (restarting)</div>
+								</div>
+								<div class="action green state-stopped-show" id="action-bot-state-start">
+									<div class="icon"><i class="fas fa-play"></i></div>
+									<div class="label">Start</div>
+								</div>
+								<div class="action red  state-running-show" id="action-bot-state-stop">
+									<div class="icon"><i class="fas fa-stop"></i></div>
+									<div class="label">Stop</div>
+								</div>
+								<div class="block">
+									<div class="title"><span class="base-asset"></span> total</div>
+									<div class="value"><span class="mono" id="bot-details-base-holdings">...</span> <span class="base-asset"></span></div>
+								</div>
+								<div class="block">
+									<div class="title"><span class="counter-asset"></span> total</div>
+									<div class="value"><span class="mono" id="bot-details-counter-holdings">...</span> <span class="counter-asset"></span></div>
+								</div>
+								<div class="block">
+									<div class="title">Total holdings in <span class="base-asset"></span> (approx)</div>
+									<div class="value"><span class="mono" id="bot-details-total-holdings">...</span> <span class="base-asset"></span></div>
+								</div>
+								<div class="block">
+									<div class="title">Profit</div>
+									<div class="value"><span class="mono" id="bot-details-total-profit">...</span> %</div>
+								</div>
+								<div class="block">
+									<div class="title">Last run</div>
+									<div class="value"><span class="mono" id="bot-details-lastrun">...</span></div>
+								</div>
+							</div>
+							<div class="pane graph">
+								<div class="block">
+									<div class="title">Graph</div>
+									<div class="graph"></div>
+								</div>
+							</div><div class="pane buysell">
+								<div class="block">
+									<div class="title">Manual trading</div>
+									<div class="action state-stopped-show state-changing-disable" id="action-bot-trade-buy">
+										<div class="icon"><i class="fas fa-shopping-cart"></i></div>
+										<div class="label">Buy <span class="counter-asset"></span></div>
+									</div>
+									<div class="action state-stopped-show state-changing-disable" id="action-bot-trade-sell">
+										<div class="icon"><i class="fas fa-times-circle"></i></div>
+										<div class="label">Sell <span class="counter-asset"></span></div>
+									</div>
+									<div class="note state-stopped-hide"><i class="fas fa-times"></i> Disabled while the bot is running</div>
+								</div>
+								<div class="block offers">
+									<div class="title">Offers &amp; trades</div>
+									<ul>
+										<li class="hidden">
+											<div class="date"><div class="icon"><i class="fas fa-clock"></i></div><span class="mono">12/05/2019 11:47 AM</span></div>
+											<div class="type"><div class="icon"><i class="fas fa-shopping-cart"></i></div><span class="">BUY SLT</span></div>
+											<div class="price"><div class="icon"><i class="fas fa-chart-bar"></i></div><span class="mono">0.1827801</span></div>
+											<div class="state">
+												<div class="black">
+													<div class="icon">
+														<i class="state-open fas fa-circle-notch fa-spin"></i>
+														<i class="state-cancelled fas fa-times"></i>
+														<i class="state-partial fas fa-circle-notch fa-spin"></i>
+														<i class="state-filled fas fa-check"></i>
+													</div><span class="">Filling (95%)</span>
+												</div><div class="white">
+													<div class="icon">
+														<i class="state-open fas fa-circle-notch fa-spin"></i>
+														<i class="state-cancelled fas fa-times"></i>
+														<i class="state-partial fas fa-circle-notch fa-spin"></i>
+														<i class="state-filled fas fa-check"></i>
+													</div><span class="">Filling (95%)</span>
+												</div>
+											</div>
+											<div class="button small state-open cancel-offer">
+												<div class="icon"><i class="fas fa-times-circle"></i></div>
+												<div class="label">Cancel offer</span></div>
+											</div>
+											<div class="button small state-partial cancel-offer">
+												<div class="icon"><i class="fas fa-times-circle"></i></div>
+												<div class="label">Cancel offer</span></div>
+											</div>
+										</li>																	
+									</ul>
+								</div>
+							</div>
+							<div class="pane log">
+								<div class="block">
+									<div class="title">Log</div>
+									<div class="log">
+										<div class="entry mono hidden"><div class="date"></div><div class="type"></div><div class="message"></div></div>
+									</div>
+								</div>
+							</div>
+							<div class="pane">
+								<div class="block">
+									<div class="title">CPU usage</div>
+									<div class="value"><span class="mono" id="bot-details-resources-cpu">...</span> %</div>
+								</div>
+								<div class="block">
+									<div class="title">Memory usage</div>
+									<div class="value"><span class="mono" id="bot-details-resources-memory">...</span> %</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab hidden" id="bot-tab-logic">
+							<div class="pane inputs">
+								<div class="block">
+									<div class="title">Inputs</div>
+									<div class="editor inputs" id="bot-tab-logic-inputs"></div>
+								</div>
+							</div>
+							<textarea id="bot-inputs-code" class="mono" style="width:50%; height:120px; font-size: 11px;"></textarea>
+							<textarea id="bot-inputs-json" class="mono" style="width:50%; height:120px; font-size: 11px;"></textarea>
+							<!--<br />-->
+							<textarea id="bot-logic-code" class="mono" style="width:50%; height:320px; font-size: 11px;"></textarea>
+							<textarea id="bot-logic-json" class="mono" style="width:50%; height:320px; font-size: 11px;"></textarea>
+							<div class="pane editor">
+								<div class="block">
+									<div class="title">Strategy editor <a href="#" class="strategy copy"><i class="fas fa-link"></i> copy strategy</a> <a href="#" class="strategy paste"><i class="fas fa-paste"></i> paste strategy</a></div>
+									<div class="editor" id="bot-tab-logic-editor"></div>
+								</div>
+							</div>
+							<div class="action" id="action-bot-logic-save">
+								<div class="icon"><i class="fas fa-check"></i></div>
+								<div class="label">Save changes</div>
+							</div>
+						</div>
+						<div class="tab hidden" id="bot-tab-settings">
+							<div class="pane">
+								<div class="block input">
+									<div class="title">Name</div>
+									<div class="input">
+										<input class="" id="bot-setting-name" />
+									</div>
+								</div>
+							</div>
+							<div class="pane">
+								<div class="block input">
+									<div class="title">Interval in seconds</div>
+									<div class="input">
+										<input class="" id="bot-setting-interval" />
+									</div>
+								</div>
+							</div>
+							<div class="pane state-stopped-show state-changing-disable">
+								<div class="block toggle">
+									<div class="title">Mode</div>
+									<input type="checkbox" id="bot-setting-mode" />
+									<div class="toggle on">
+										<div class="radio"></div>
+										<div class="label label-on">Live</div>
+										<div class="label label-off">Testnet</div>
+									</div>
+								</div>
+							</div>
+							<div class="pane wallet mode-testnet state-stopped-show state-changing-disable ">
+								<div class="block input">
+									<div class="title">Testnet Wallet</div>
+									<div class="note gotwallet-testnet">Public wallet address, use this address to deposit the base asset to this bot</div>
+									<div class="input disabled gotwallet-testnet">
+										<input class="" id="bot-setting-wallet-testnet-public" />
+									</div>
+									<div class="note nowallet-testnet">No wallet defined, please create one with the button below</div>
+									<div class="action green nowallet-testnet" id="action-bot-settings-wallet-testnet-create">
+										<div class="icon"><i class="fas fa-magic"></i></div>
+										<div class="label">Create new wallet</div>
+									</div>
+								</div>
+							</div>
+							<div class="pane wallet mode-live state-stopped-show state-changing-disable ">
+								<div class="block input">
+									<div class="title">Live Wallet</div>
+									<div class="note gotwallet-live">Public wallet address, use this address to deposit the base asset to this bot</div>
+									<div class="input disabled gotwallet-live">
+										<input class="" id="bot-setting-wallet-live-public" />
+									</div>
+									<div class="note nowallet-live">No wallet defined, please create one with the button below</div>
+									<div class="action green nowallet-live" id="action-bot-settings-wallet-live-create">
+										<div class="icon"><i class="fas fa-magic"></i></div>
+										<div class="label">Create new wallet</div>
+									</div>
+								</div>
+							</div>
+							<div class="pane tradepair mode-testnet state-stopped-show state-changing-disable ">
+								<div class="block input two-inputs">
+									<div class="title">Testnet base asset</div>
+									<div class="note">Type (For example: USD, EUR, XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-testnet-baseasset-type" />
+									</div>
+									<div class="note">Issuer address (Leave empty for XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-testnet-baseasset-issuer" />
+									</div>
+								</div>
+							</div>
+							<div class="pane tradepair mode-live state-stopped-show state-changing-disable ">
+								<div class="block input two-inputs">
+									<div class="title">Live base asset</div>
+									<div class="note">Type (For example: USD, EUR, XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-live-baseasset-type" />
+									</div>
+									<div class="note">Issuer address (Leave empty for XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-live-baseasset-issuer" />
+									</div>
+								</div>
+							</div>
+							<div class="pane tradepair mode-testnet state-stopped-show state-changing-disable ">
+								<div class="block input two-inputs">
+									<div class="title">Testnet counter asset</div>
+									<div class="note">Type (For example: USD, EUR, XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-testnet-counterasset-type" />
+									</div>
+									<div class="note">Issuer address (Leave empty for XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-testnet-counterasset-issuer" />
+									</div>
+								</div>
+							</div>
+							<div class="pane tradepair mode-live state-stopped-show state-changing-disable ">
+								<div class="block input two-inputs">
+									<div class="title">Live counter asset</div>
+									<div class="note">Type (For example: USD, EUR, XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-live-counterasset-type" />
+									</div>
+									<div class="note">Issuer address (Leave empty for XLM)</div>
+									<div class="input">
+										<input class="" id="bot-setting-live-counterasset-issuer" />
+									</div>
+								</div>
+							</div>
+							<div class="pane note state-running-show state-changing-hide ">
+								<div class="note"><i class="fas fa-exclamation-triangle"></i> Bot is running. Stop the bot to be able to edit more settings.</div>
+							</div>
+							<div class="action" id="action-bot-settings-save">
+								<div class="icon"><i class="fas fa-check"></i></div>
+								<div class="label">Save changes</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

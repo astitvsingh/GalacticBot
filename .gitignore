@@ -1,0 +1,7 @@
+*.swp
+*.swa
+config.json
+node_modules
+db/data/*
+!db/data/DUMMY
+db/mongo.log
