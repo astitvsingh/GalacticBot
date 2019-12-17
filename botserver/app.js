@@ -173,6 +173,8 @@ function resumeBots() {
 				if (botInstances) {
 					for(var i in botInstances) {
 						var shouldStartBot = botInstances[i].wantedState == 'RUNNING';
+
+						shouldStartBot = shouldStartBot || botInstances[i].tradeState != botInstances[i].wantedTradeState;
 						
 						if (!shouldStartBot && botInstances[i].botInstanceOfferID) {
 							var currentOffer = await BotOffer.findById(botInstances[i].botInstanceOfferID);

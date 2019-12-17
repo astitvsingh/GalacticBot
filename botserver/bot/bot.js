@@ -716,8 +716,6 @@ class Bot {
 					//}		
 				}
 
-				console.log('hier ', this.instance.current.botInstanceOfferID);
-
 				switch(this.instance.tradeState) {
 					case "":
 					case "OFFERED":

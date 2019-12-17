@@ -386,6 +386,7 @@ class BotFork {
 								baseAsset: Utils.assetToString(baseAsset),
 								counterAsset: Utils.assetToString(counterAsset),
 								price: price,
+								paidPrice: price,
 								amount: amount,
 								hash: transactionResult.hash,
 								envelope_xdr: transactionResult.envelope_xdr,
@@ -404,7 +405,12 @@ class BotFork {
 						self.sendHorizonCallResponse(call.requestID, {success: false, offer: null});
 
 						console.log('Something went wrong.');
-						console.log('extras = ', e.response.data.extras);
+
+						if (e.response && e.response.data)
+							console.log('extras = ', e.response.data.extras);
+						else
+							console.log('e = ', e);
+
 						console.log(' - offerId = ', offerId);
 						console.log(' - buyingAsset = ', buyingAsset.code);
 						console.log(' - sellingAsset = ', sellingAsset.code);
