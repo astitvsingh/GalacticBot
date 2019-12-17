@@ -168,17 +168,29 @@ function resumeBots() {
 		const interval = 1;
 
 		BotInstance.find(
-			{wantedState: 'RUNNING'},
-			function(err, botInstances) {
+			{},
+			async function(err, botInstances) {
 				if (botInstances) {
 					for(var i in botInstances) {
-						console.log('Resuming bot ' + botInstances[i].remoteID + ' - ' + botInstances[i].name);
+						var shouldStartBot = botInstances[i].wantedState == 'RUNNING';
+						
+						if (!shouldStartBot && botInstances[i].botInstanceOfferID) {
+							var currentOffer = await BotOffer.findById(botInstances[i].botInstanceOfferID);
 							
-						startBotByRemoteID(botInstances[i].remoteID, delay);
+							if (currentOffer && currentOffer.state == BotOffer.STATE_OPEN) {
+								shouldStartBot = true;
+							}						
+						}
 
-						startedBotsByID[botInstances[i].remoteID] = true;
+						if (shouldStartBot) {
+							console.log('Resuming bot ' + botInstances[i].remoteID + ' - ' + botInstances[i].name);
+							
+							startBotByRemoteID(botInstances[i].remoteID, delay);
 
-						delay += interval;
+							startedBotsByID[botInstances[i].remoteID] = true;
+
+							delay += interval;
+						}
 					}
 				}
 			}

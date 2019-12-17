@@ -439,7 +439,7 @@ class Bot {
 					this.logVerbose('Loading current offer details, offerID = ' + this.instance.botInstanceOfferID);
 					this.currentBotInstanceOffer = await BotOffer.findById(this.instance.botInstanceOfferID);
 
-					if (!this.instance.currentBotInstanceOffer) {
+					if (!this.currentBotInstanceOffer) {
 						this.logVerbose('Invalid offer');
 						this.instance.botInstanceOfferID = null;
 					}
@@ -715,6 +715,8 @@ class Bot {
 					//	this.instance.tradeState = "CANCEL_CONFIRMED";
 					//}		
 				}
+
+				console.log('hier ', this.instance.current.botInstanceOfferID);
 				
 				switch(this.instance.tradeState) {
 					case "":

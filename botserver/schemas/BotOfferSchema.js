@@ -186,7 +186,9 @@ BotOfferModel.prototype.updateFillState = async function() {
 		//process.exit();
 	}
 
-	if (this.fillPercentage >= 100) {
+	if (this.fillPercentage >= 100.1) {
+		console.log('Todo: check if we calculated the fill percentage correctly ...');
+	} else if (this.fillPercentage == 100) {
 		this.state = BotOfferModel.STATE_FILLED;
 		await this.save();
 	} else if (this.fillPercentage > 0) {
