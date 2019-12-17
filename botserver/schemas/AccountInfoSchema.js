@@ -59,8 +59,14 @@ AccountInfoModel.prototype.getBalanceForAsset = function(asset, doNotSubtractMin
 			if (balanceAsset.asset_type == 'native' && asset.code == 'XLM' && !asset.issuer) {
 				balance = balance.plus(new BigNumber(balanceAsset.balance));
 
-				if (subtractMiniumReserve)
-				balance = balance.minus(new BigNumber(this.getMinimumXLMReserve()));
+				if (subtractMiniumReserve) {
+					balance = balance.minus(new BigNumber(this.getMinimumXLMReserve()));
+
+					// xlm can drop slightly below zero because we subtract the minimum reserve from the balance
+					if (balance.isNegative())
+						balance = new BigNumber(0);
+				}
+					
 			} else if (balanceAsset.asset_code == asset.code && balanceAsset.asset_issuer == asset.issuer) {
 				balance = balance.plus(new BigNumber(balanceAsset.balance));
 			} 				
