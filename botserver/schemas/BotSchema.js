@@ -159,6 +159,10 @@ const BotSchema = new mongoose.Schema({
 		required: false,
 		default: 0
 	},
+	currentPrice: {
+		type: Number,
+		required: false
+	},
 	currentProfit: {
 		type: Number,
 		required: false,

@@ -361,6 +361,8 @@ class Bot {
 			let counterAsset = this.instance.live ? Utils.assetInfoToAsset(this.instance.liveCounterassetType, this.instance.liveCounterassetIssuer) : Utils.assetInfoToAsset(this.instance.testnetCounterassetType, this.instance.testnetCounterassetIssuer);
 			let currentPrice = await Price.getCurrentPrice(this.instance.live, baseAsset, counterAsset);
 
+			this.instance.currentPrice = currentPrice;
+
 			if (!this.accountInfo && !this.triedToLoadAccount) {
 				// force load account at bot startup
 				this.triedToLoadAccount = true;

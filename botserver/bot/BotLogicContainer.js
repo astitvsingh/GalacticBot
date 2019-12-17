@@ -1,5 +1,6 @@
 const BotLogicVariable = require('./BotLogicVariable.js');
 const BotLogicTradeAction = require('./BotLogicTradeAction.js');
+const BigNumber = require('bignumber.js');
 
 class BotLogicContainer {
 	constructor() {
@@ -57,7 +58,11 @@ class BotLogicContainer {
 	}
 
 	gotMoreBaseThanCounter() {
-		return this.bot.instance.baseAssetBalance >= this.bot.instance.counterAssetBalance;
+		const baseAssetBalance = new BigNumber(this.bot.instance.baseAssetBalance);
+		const currentPrice = new BigNumber(this.bot.instance.currentPrice);
+		const counterAssetBalanceInBase = new BigNumber(this.bot.instance.counterAssetBalance).dividedBy(currentPrice);
+		
+		return baseAssetBalance >= counterAssetBalanceInBase;
 	}
 
 	gotMoreCounterThanBase() {
