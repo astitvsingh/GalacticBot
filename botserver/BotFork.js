@@ -406,7 +406,7 @@ class BotFork {
 
 						console.log('Something went wrong.');
 
-						if (e.response && e.response.data)
+						if (e.response && e.response.data && e.response.data.extras)
 							console.log('extras = ', e.response.data.extras);
 						else
 							console.log('e = ', e);

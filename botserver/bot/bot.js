@@ -724,6 +724,7 @@ class Bot {
 
 								if (this.currentBotInstanceOffer && this.currentBotInstanceOffer._id == this.instance.botInstanceOfferID && this.currentBotInstanceOffer.state == BotOffer.STATE_FILLED) {
 									this.instance.tradeState = '';
+									this.instance.lastUpdateAccountTimestamp = null; // This will update the stellar account
 									this.logVerbose('Offer got fulfilled and is done.');
 								}
 							}
