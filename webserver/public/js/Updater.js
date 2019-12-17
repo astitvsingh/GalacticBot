@@ -45,7 +45,7 @@ function Updater() {
 	self.botServerStats = null;
 	
 	self.since = new Date().getTime()-2;
-	setInterval(function() { self.update(); }, 2000);
+	setInterval(function() { self.update(); }, 5000);
 	self.update();
 }
 

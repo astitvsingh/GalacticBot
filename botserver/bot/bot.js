@@ -276,6 +276,15 @@ class Bot {
 		)
 	}
 
+	async performFullReset() {
+		await BotOfferModel.find({remoteID: this.instance.remoteID, state: BotOfferModel.STATE_CANCELLED}).deleteMany();
+		await BotOfferModel.find({remoteID: this.instance.remoteID, state: BotOfferModel.STATE_FILLED}).deleteMany();
+		
+		this.instance.startTotalAssetBalance = null;
+
+		this.logVerbose('Full reset performed.');
+	}
+
 	async tick() {
 		var self = this;
 
@@ -309,8 +318,7 @@ class Bot {
 
 			if (this.instance.wantedState != this.instance.state) {
 				if (this.instance.wantedState == "RUNNING") {
-					await BotOfferModel.find({remoteID: this.instance.remoteID, state: BotOfferModel.STATE_CANCELLED}).deleteMany();
-					await BotOfferModel.find({remoteID: this.instance.remoteID, state: BotOfferModel.STATE_FILLED}).deleteMany();
+					await this.performFullReset();
 				} 
 				
 				this.instance.state = this.instance.wantedState;
