@@ -26,6 +26,10 @@ const BotOfferSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
+	paidPrice: {
+		type: Number,
+		required: true
+	},
 	counterAsset: {
 		type: String,
 		required: true
@@ -39,6 +43,11 @@ const BotOfferSchema = new mongoose.Schema({
 		required: false,
 		default: 0,
 	},
+	amountSold: {
+		type: Number,
+		required: false,
+		default: 0,
+	},	
 	fillPercentage: {
 		type: Number,
 		required: false,
@@ -158,32 +167,43 @@ BotOfferModel.prototype.updateFillState = async function() {
 		return;
 
 	var amountBought = new BigNumber(0);
+	var amountSold = new BigNumber(0);
+	var paidPrice = new BigNumber(0);
 	var amountRemaining = new BigNumber(this.amount);
 	var amountTotal = new BigNumber(this.amount);
 
 	for(var i in this.parsedClaimedOffers) {
 		var offer = this.parsedClaimedOffers[i];
-		var amount = new BigNumber(this.type == BotOfferModel.TYPE_BUY ? offer.amountSold : offer.amountBought);
+		var buyAmount = new BigNumber(this.type == BotOfferModel.TYPE_BUY ? offer.amountSold : offer.amountBought);
+		var sellAmount = new BigNumber(this.type == BotOfferModel.TYPE_BUY ? offer.amountBought : offer.amountSold);
 
-		console.log('amount = ', amount.toString());
+		console.log('buyAmount = ', buyAmount.toString());
+		console.log('sellAmount = ', sellAmount.toString());
 
-		amountBought = amountBought.plus(amount);
-		amountRemaining = amountRemaining.minus(amount);
+		amountBought = amountBought.plus(buyAmount);
+		amountRemaining = amountRemaining.minus(buyAmount);
+
+		amountSold = amountSold.plus(sellAmount);
 	}
 
 	var fillPercentage = amountBought.isZero() ? new BigNumber(0) : amountTotal.div(amountBought);
 	fillPercentage = Math.round(100*100*fillPercentage)/100;
 
+	if (!amountSold.isZero())
+		paidPrice = amountBought.div(amountSold);
+
 	console.log('amountBought = ', amountBought.toString());
 	console.log('amountRemaining = ', amountRemaining.toString());	
 	console.log('fillPercentage = ', fillPercentage);	
+	console.log('paidPrice = ', paidPrice.toString());	
 
 	this.amountFilled = amountBought.toString();
+	this.amountSold = amountSold.toString();
+	this.paidPrice = paidPrice.toString();
 	this.fillPercentage = fillPercentage;
 
 	if (this.type == 'SELL') {
 		//console.log('sell checken ...');
-		//process.exit();
 	}
 
 	if (this.fillPercentage >= 100.1) {

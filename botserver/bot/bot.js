@@ -579,7 +579,7 @@ class Bot {
 								if (lastFilledTrade && lastFilledTrade.length == 1) {
 									lastFilledTrade = lastFilledTrade.shift();
 
-									var lastPrice = lastFilledTrade.type == 'BUY' ? new BigNumber(1).dividedBy(lastFilledTrade.price) : new BigNumber(lastFilledTrade.price);
+									var lastPrice = lastFilledTrade.type == 'BUY' ? new BigNumber(1).dividedBy(lastFilledTrade.paidPrice) : new BigNumber(lastFilledTrade.paidPrice);
 									
 									percentage = parseFloat(lastPrice.dividedBy(currentPrice).multipliedBy(100).toString());
 									percentage = percentage - 100;
@@ -717,7 +717,7 @@ class Bot {
 				}
 
 				console.log('hier ', this.instance.current.botInstanceOfferID);
-				
+
 				switch(this.instance.tradeState) {
 					case "":
 					case "OFFERED":
