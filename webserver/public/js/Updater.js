@@ -74,8 +74,10 @@ Updater.prototype.updateCPUUsage = function() {
 	$('#system-cpu-usage').text(count ? usage : '...');
 	$('#system-memory-usage').text(count ? memory : '...');
 
+	if (!this.botServerStats)
+		this.botServerStats = { botProccessCount: 2 };
+		
 	if (this.botServerStats) {
-		this.botServerStats.botProccessCount = 2;
 		$('#system-bot-count').text(parseInt(this.botServerStats.botProccessCount) == 1 ? "1 bot" : parseInt(this.botServerStats.botProccessCount) + " bots");
 	}
 }
