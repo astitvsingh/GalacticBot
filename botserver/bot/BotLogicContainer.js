@@ -1,6 +1,8 @@
 const BotLogicVariable = require('./BotLogicVariable.js');
 const BotLogicTradeAction = require('./BotLogicTradeAction.js');
+const Price = require('../schemas/PriceSchema.js');
 const BigNumber = require('bignumber.js');
+const Utils = require('../../webserver/Utils.js');
 
 class BotLogicContainer {
 	constructor() {
@@ -8,7 +10,7 @@ class BotLogicContainer {
 		this.tradeAction = null;
 	}
 
-	run(bot, inputTree, logicTree) {
+	async run(bot, inputTree, logicTree) {
 		this.bot = bot;
 
 		var inputsCode = inputTree.toCode();
@@ -16,7 +18,7 @@ class BotLogicContainer {
 		var error = false;
 
 		try {
-			eval(inputsCode);
+			eval("(async () => {" + inputsCode + "})()")
 		} catch(e) {
 			bot.logError('Error while trying to satisfy inputs: ' + e);
 			console.log('Code = ', inputsCode);
@@ -32,7 +34,7 @@ class BotLogicContainer {
 
 			try {
 				//console.log('Code = ', logicCode);
-				eval(logicCode);
+				eval("(async () => {" + logicCode + "})()")
 			} catch(e) {
 				bot.logError('Error while trying to execute logic: ' + e);
 				console.log('Code = ', logicCode);
@@ -70,7 +72,7 @@ class BotLogicContainer {
 	}
 
 	priceChangeSinceLastBuyPercentage() {
-		return  this.bot.priceChangeSinceLastBuyPercentage / 100;
+		return this.bot.priceChangeSinceLastBuyPercentage / 100;
 	}
 
 	hasOpenOffer() {
@@ -83,6 +85,16 @@ class BotLogicContainer {
 
 	logError(what) {
 		this.bot.logError(typeof what == 'object' ? what.value : what);
+	}
+
+	async priceChangeInTime(seconds) {
+		let baseAsset = this.bot.instance.live ? Utils.assetInfoToAsset(this.bot.instance.liveBaseassetType, this.bot.instance.liveBaseassetIssuer) : Utils.assetInfoToAsset(this.bot.instance.testnetBaseassetType, this.bot.instance.testnetBaseassetIssuer);
+		let counterAsset = this.bot.instance.live ? Utils.assetInfoToAsset(this.bot.instance.liveCounterassetType, this.bot.instance.liveCounterassetIssuer) : Utils.assetInfoToAsset(this.bot.instance.testnetCounterassetType, this.bot.instance.testnetCounterassetIssuer);
+			
+		var priceTimeAgo = await Price.getPriceAtSecondsAgo(this.bot.instance.live, baseAsset, counterAsset, seconds);
+		var priceNow = await Price.getPriceAtSecondsAgo(this.bot.instance.live, baseAsset, counterAsset, 0);
+
+		return (priceNow / priceTimeAgo) - 1;
 	}
 
 	toArray() {

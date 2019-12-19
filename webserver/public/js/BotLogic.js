@@ -5,6 +5,75 @@ function arrayRemove(arr, value) {
 	});
 }
 
+function trim (str, charlist) {
+	//  discuss at: https://locutus.io/php/trim/
+	// original by: Kevin van Zonneveld (https://kvz.io)
+	// improved by: mdsjack (https://www.mdsjack.bo.it)
+	// improved by: Alexander Ermolaev (https://snippets.dzone.com/user/AlexanderErmolaev)
+	// improved by: Kevin van Zonneveld (https://kvz.io)
+	// improved by: Steven Levithan (https://blog.stevenlevithan.com)
+	// improved by: Jack
+	//    input by: Erkekjetter
+	//    input by: DxGx
+	// bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
+	//   example 1: trim('    Kevin van Zonneveld    ')
+	//   returns 1: 'Kevin van Zonneveld'
+	//   example 2: trim('Hello World', 'Hdle')
+	//   returns 2: 'o Wor'
+	//   example 3: trim(16, 1)
+	//   returns 3: '6'
+   
+	var whitespace = [
+	  ' ',
+	  '\n',
+	  '\r',
+	  '\t',
+	  '\f',
+	  '\x0b',
+	  '\xa0',
+	  '\u2000',
+	  '\u2001',
+	  '\u2002',
+	  '\u2003',
+	  '\u2004',
+	  '\u2005',
+	  '\u2006',
+	  '\u2007',
+	  '\u2008',
+	  '\u2009',
+	  '\u200a',
+	  '\u200b',
+	  '\u2028',
+	  '\u2029',
+	  '\u3000'
+	].join('')
+	var l = 0
+	var i = 0
+	str += ''
+   
+	if (charlist) {
+	  whitespace = (charlist + '').replace(/([[\]().?/*{}+$^:])/g, '$1')
+	}
+   
+	l = str.length
+	for (i = 0; i < l; i++) {
+	  if (whitespace.indexOf(str.charAt(i)) === -1) {
+	    str = str.substring(i)
+	    break
+	  }
+	}
+   
+	l = str.length
+	for (i = l - 1; i >= 0; i--) {
+	  if (whitespace.indexOf(str.charAt(i)) === -1) {
+	    str = str.substring(0, i + 1)
+	    break
+	  }
+	}
+   
+	return whitespace.indexOf(str.charAt(0)) === -1 ? str : ''
+   }
+
 if (typeof module != 'undefined') {
 	function $() { return new fakeQuery(); }
 
@@ -137,14 +206,15 @@ class BotLogic {
 		return this.root.toJson();
 	}
 
-	static defineType(type, ID, label, args, returnType, forInputs) {
+	static defineType(type, ID, label, args, returnType, forInputs, allowedAsFirstInLine) {
 		BotLogic.types[ID] = {
 			type: type,
 			ID: ID,
 			label: label,
 			arguments: args,
 			returnType: returnType,
-			forInputs: forInputs
+			forInputs: forInputs,
+			allowedAsFirstInLine: allowedAsFirstInLine == undefined ? true : allowedAsFirstInLine ? true : false
 		};
 	}
 	
@@ -349,6 +419,15 @@ class BotLogicElement {
 		this.inputElement.find('input').attr('placeholder', hint);
 	}
 
+	sanitizeInputName(name) {
+		name = name.replace(/[\W_]+/g, '_');
+
+		if (name.match(/^\d/))
+			name = 'var_' + name;
+
+		return name;
+	}
+
 	toCode(depthString) {
 		var code = '';
 		depthString = depthString || '';
@@ -375,18 +454,18 @@ class BotLogicElement {
 			case BotLogic.TYPE_OR:				code = '||'; break;
 
 			case BotLogic.TYPE_STRING:			code = JSON.stringify(this.getInputValue(BotLogic.TYPE_STRING)); break;
-			case BotLogic.TYPE_INPUT_NAME:		code = JSON.stringify(this.getInputValue(BotLogic.TYPE_INPUT_NAME)); break;
+			case BotLogic.TYPE_INPUT_NAME:		code = JSON.stringify(this.sanitizeInputName(this.getInputValue(BotLogic.TYPE_INPUT_NAME))); break;
 			case BotLogic.TYPE_NUMBER:			code = JSON.stringify(this.getInputValue(BotLogic.TYPE_NUMBER)); break;
 			case BotLogic.TYPE_BOOLEAN:			code = JSON.stringify(this.getInputValue(BotLogic.TYPE_BOOLEAN)); break;
 			case BotLogic.TYPE_PERCENTAGE:		code = JSON.stringify(this.getInputValue(BotLogic.TYPE_PERCENTAGE)/100); break;
 
-			case BotLogic.TYPE_INPUT:			code = this.inputName; break;
+			case BotLogic.TYPE_INPUT:			code = this.sanitizeInputName(this.inputName); break;
 			
 			case BotLogic.TYPE_ARGUMENT:			code = 'null'; break;
 			case BotLogic.TYPE_VARIABLE:			code = 'null'; break;
 
-			case BotLogic.TYPE_FUNCTION:			
-					code = depthString + 'this.' + (this.functionType ? this.functionType.ID : 'undefined') + '(';
+			case BotLogic.TYPE_FUNCTION:	
+					code = depthString + 'await this.' + (this.functionType ? this.functionType.ID : 'undefined') + '(';
 					var count = 0;
 					
 					for (var i in this.arguments) {
@@ -1048,7 +1127,7 @@ class BotLogicElement {
 			case BotLogic.TYPE_INPUTS_ROOT:
 					switch(childType) {
 						case BotLogic.TYPE_FUNCTION:
-							return true;
+							return typeDefinition.allowedAsFirstInLine;
 					}
 				break;
 			case BotLogic.TYPE_IF:
@@ -1740,15 +1819,23 @@ BotLogic.defineType(
 BotLogic.defineType(
 	BotLogic.TYPE_FUNCTION,
 	"priceChangeSinceLastBuyPercentage",
-	"Price change since last buy %",
+	"Price change since last buy or bot start %",
 	[],
 	BotLogic.TYPE_PERCENTAGE
 );
 
 BotLogic.defineType(
 	BotLogic.TYPE_FUNCTION,
+	"priceChangeInTime",
+	"Price change over time",
+	[ new BotLogicArgument("seconds", BotLogic.TYPE_NUMBER, false) ],
+	BotLogic.TYPE_PERCENTAGE
+);
+
+BotLogic.defineType(
+	BotLogic.TYPE_FUNCTION,
 	"buyAtPrice",
-	"Buy offer {counter} at price",
+	"Buy {counter} at price",
 	[ new BotLogicArgument("price", BotLogic.TYPE_VARIABLE, false) ],
 	BotLogic.TYPE_VOID
 );
@@ -1756,7 +1843,7 @@ BotLogic.defineType(
 BotLogic.defineType(
 	BotLogic.TYPE_FUNCTION,
 	"sellAtPrice",
-	"Sell offer {counter} at price",
+	"Sell {counter} at price",
 	[ new BotLogicArgument("price", BotLogic.TYPE_VARIABLE, false) ],
 	BotLogic.TYPE_VOID
 );

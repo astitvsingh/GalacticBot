@@ -281,6 +281,7 @@ class Bot {
 		await BotOfferModel.find({remoteID: this.instance.remoteID, state: BotOfferModel.STATE_FILLED}).deleteMany();
 		
 		this.instance.startTotalAssetBalance = null;
+		this.instance.priceAtStart = null;
 
 		this.logVerbose('Full reset performed.');
 	}
@@ -575,27 +576,35 @@ class Bot {
 							//if (!this.logicContainer.tradeAction) {
 								this.logVerbose('Running bot logic.');
 
+								if (!this.instance.priceAtStart)
+									this.instance.priceAtStart = currentPrice;
+
 								var percentage = 0;
 								var lastFilledTrade = await BotOfferModel.find({type: 'BUY', state: BotOfferModel.STATE_FILLED}).sort({createdOn: -1}).limit(1);
-								
+								var currentPriceB = new BigNumber(currentPrice);
+
 								if (lastFilledTrade && lastFilledTrade.length == 1) {
 									lastFilledTrade = lastFilledTrade.shift();
 
 									var lastPrice = lastFilledTrade.type == 'BUY' ? new BigNumber(1).dividedBy(lastFilledTrade.paidPrice) : new BigNumber(lastFilledTrade.paidPrice);
 									
-									percentage = parseFloat(lastPrice.dividedBy(currentPrice).multipliedBy(100).toString());
+									percentage = parseFloat(currentPriceB.dividedBy(lastPrice).multipliedBy(100).toString());
 									percentage = percentage - 100;
 
 									console.log('lastFilledTrade.type = ', lastFilledTrade.type);
 									console.log('lastFilledTrade.price = ', lastFilledTrade.price);
 									console.log('currentPrice = ', currentPrice);
 									console.log('percentage = ', percentage);
+								} else {
+									var priceAtStart = new BigNumber(this.instance.priceAtStart);
+									percentage = parseFloat(currentPriceB.dividedBy(priceAtStart).multipliedBy(100).toString());
+									percentage = percentage - 100;
 								}
 
 								this.priceChangeSinceLastBuyPercentage = percentage;
 
 								this.logicContainer.defineVariable_const('currentPrice', currentPrice);
-								this.logicContainer.run(this, this.inputTree, this.logicTree);
+								await this.logicContainer.run(this, this.inputTree, this.logicTree);
 							//} else {
 							//	this.logVerbose('Not running bot logic while where waiting for a horizon call to complete.');
 							//}

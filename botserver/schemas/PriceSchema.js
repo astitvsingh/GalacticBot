@@ -46,16 +46,22 @@ PriceSchema.pre(
 
 PriceModel = mongoose.model('PriceSchema', PriceSchema)
 
-PriceModel.getCurrentPrice = async function(onLive, baseAsset, counterAsset) {
+PriceModel.getPriceAtSecondsAgo = async function(onLive, baseAsset, counterAsset, secondsAgo) {
 	if (!baseAsset || !counterAsset)
 		return null;
 
 	var combo = Utils.getSortedAssetCombo(onLive, baseAsset, counterAsset)
+	
+	var now = new Date();
+	now.setSeconds(0);
+	var atTime = now.getTime();
+	atTime -= secondsAgo * 1000;
 
 	var price = await PriceModel.findOne({
 		baseAsset: Utils.assetToString(combo.firstAsset),
 		counterAsset: Utils.assetToString(combo.secondAsset),
-		onLive: onLive
+		onLive: onLive,
+		date: { $lte: atTime },
 	}).sort({date: -1});
 
 	if (price) {
@@ -66,6 +72,10 @@ PriceModel.getCurrentPrice = async function(onLive, baseAsset, counterAsset) {
 	}
 
 	return null;
+}
+
+PriceModel.getCurrentPrice = async function(onLive, baseAsset, counterAsset) {
+	return this.getPriceAtSecondsAgo(onLive, baseAsset, counterAsset, 0);
 }
 
 module.exports = PriceModel
