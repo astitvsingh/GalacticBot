@@ -11,3 +11,7 @@ https://galacticbot.com:3000/
 
 - Currently in beta.
 - Documentation will be updated soon.
+
+# Warning
+
+Please note that this library is still under development. We advice to use this software only on the Stellar testnet as this is experimental code created for R&D into blockchain technology.
